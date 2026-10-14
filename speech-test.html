@@ -1,0 +1,193 @@
+
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#155eef">
+<title>آزمایش میکروفون فارسی پلتوب</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;padding:20px;
+  font-family:Tahoma,Arial,sans-serif;
+  background:#f3f6fc;color:#182230;
+  font-size:17px;line-height:1.9
+}
+main{
+  max-width:620px;margin:20px auto;
+  background:white;border-radius:20px;
+  padding:22px;box-shadow:0 5px 25px #172b4d12
+}
+h1{font-size:23px;color:#155eef;margin-top:0}
+p{margin:10px 0}
+button,select{
+  width:100%;padding:13px;margin:7px 0;
+  border-radius:12px;border:1px solid #ccd5e3;
+  font:inherit;background:white
+}
+button{background:#155eef;color:white;border:0;font-weight:bold}
+button:disabled{opacity:.5}
+#status,#result,#log{
+  background:#f4f7fb;border-radius:12px;
+  padding:12px;margin-top:12px;overflow-wrap:anywhere
+}
+#result{min-height:90px;white-space:pre-wrap}
+#log{font-size:14px;white-space:pre-wrap;direction:ltr;text-align:left}
+.good{color:#087443}.bad{color:#b42318}
+small{color:#667085}
+</style>
+</head>
+<body>
+<main>
+<h1>🎙️ آزمایش تشخیص گفتار فارسی</h1>
+<p>زبان تشخیص روی فارسی تنظیم شده است. اجازهٔ میکروفون را بده و یک جملهٔ کوتاه بگو.</p>
+
+<label for="lang">زبان آزمایش</label>
+<select id="lang">
+  <option value="fa-IR" selected>فارسی — ایران (fa-IR)</option>
+  <option value="en-US">انگلیسی (en-US)</option>
+</select>
+
+<button id="start">🎙️ شروع شنیدن</button>
+<button id="stop" disabled>⏹️ توقف</button>
+
+<div id="status">وضعیت: آمادهٔ آزمایش</div>
+<p><strong>متن تشخیص‌داده‌شده:</strong></p>
+<div id="result">هنوز متنی دریافت نشده است.</div>
+<p><strong>گزارش فنی:</strong></p>
+<div id="log">آماده</div>
+<p><small>این آزمایش مستقل است و کد اصلی پلتوب را تغییر نمی‌دهد. تشخیص گفتار ممکن است به اینترنت و سرویس مرورگر وابسته باشد.</small></p>
+</main>
+
+<script>
+(function(){
+  const startBtn=document.getElementById('start');
+  const stopBtn=document.getElementById('stop');
+  const statusBox=document.getElementById('status');
+  const resultBox=document.getElementById('result');
+  const logBox=document.getElementById('log');
+  const langSelect=document.getElementById('lang');
+
+  const Recognition=window.SpeechRecognition||
+                    window.webkitSpeechRecognition;
+  let recognition=null;
+  let running=false;
+  let finalText='';
+
+  function log(message){
+    const time=new Date().toLocaleTimeString();
+    logBox.textContent='['+time+'] '+message+'\n'+logBox.textContent;
+  }
+
+  function status(message,kind){
+    statusBox.textContent='وضعیت: '+message;
+    statusBox.className=kind||'';
+  }
+
+  if(!Recognition){
+    status('این مرورگر API تشخیص گفتار را در دسترس قرار نداده است.','bad');
+    log('SpeechRecognition و webkitSpeechRecognition پیدا نشدند.');
+    startBtn.disabled=true;
+    return;
+  }
+
+  log('API تشخیص گفتار پیدا شد.');
+
+  startBtn.addEventListener('click',function(){
+    if(running)return;
+
+    try{
+      recognition=new Recognition();
+      recognition.lang=langSelect.value;
+      recognition.continuous=false;
+      recognition.interimResults=true;
+      recognition.maxAlternatives=3;
+      finalText='';
+      resultBox.textContent='در حال انتظار برای گفتار...';
+      log('درخواست شروع؛ زبان='+recognition.lang);
+      status('در حال شروع شنیدن...');
+
+      recognition.onstart=function(){
+        running=true;
+        startBtn.disabled=true;
+        stopBtn.disabled=false;
+        status('میکروفون فعال است؛ صحبت کن.','good');
+        log('رویداد start دریافت شد.');
+      };
+
+      recognition.onaudiostart=function(){
+        log('رویداد audiostart: دریافت صوت شروع شد.');
+      };
+
+      recognition.onsoundstart=function(){
+        log('رویداد soundstart: صدای ورودی شناسایی شد.');
+      };
+
+      recognition.onspeechstart=function(){
+        log('رویداد speechstart: گفتار شناسایی شد.');
+      };
+
+      recognition.onresult=function(event){
+        let interim='';
+        for(let i=event.resultIndex;i<event.results.length;i++){
+          const item=event.results[i];
+          const text=item[0].transcript;
+          log('نتیجه: "'+text+'" | نهایی='+item.isFinal+
+              ' | اطمینان='+item[0].confidence);
+          if(item.isFinal) finalText+=text+' ';
+          else interim+=text;
+        }
+        const shown=(finalText+interim).trim();
+        resultBox.textContent=shown||'نتیجهٔ خالی دریافت شد.';
+        status('نتیجه دریافت شد.','good');
+      };
+
+      recognition.onerror=function(event){
+        log('خطا: '+event.error+
+            (event.message?' | '+event.message:''));
+        status('خطا: '+event.error,'bad');
+      };
+
+      recognition.onspeechend=function(){
+        log('رویداد speechend: گفتار پایان یافت.');
+      };
+
+      recognition.onaudioend=function(){
+        log('رویداد audioend: دریافت صوت پایان یافت.');
+      };
+
+      recognition.onend=function(){
+        running=false;
+        startBtn.disabled=false;
+        stopBtn.disabled=true;
+        if(finalText.trim()){
+          resultBox.textContent=finalText.trim();
+          status('آزمایش تمام شد؛ متن دریافت شد.','good');
+        }else{
+          status('شنیدن پایان یافت؛ متن نهایی دریافت نشد.','bad');
+        }
+        log('رویداد end دریافت شد.');
+      };
+
+      recognition.start();
+    }catch(error){
+      running=false;
+      startBtn.disabled=false;
+      stopBtn.disabled=true;
+      status('شروع ناموفق بود.','bad');
+      log('استثنا: '+error.name+' | '+error.message);
+    }
+  });
+
+  stopBtn.addEventListener('click',function(){
+    if(recognition&&running){
+      status('درخواست توقف...');
+      try{recognition.stop();log('stop() فراخوانی شد.');}
+      catch(error){log('خطای توقف: '+error.message);}
+    }
+  });
+})();
+</script>
+</body>
+</html>
