@@ -1,32 +1,10 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#155eef">
-  <title>هوش پلتوب | آکادمی ۷</title>
-  <style>
-    *{box-sizing:border-box}
-    html,body{margin:0;width:100%;height:100%;background:#f5f7fb;font-family:Tahoma,Arial,sans-serif}
-    .shell{height:100%;display:flex;flex-direction:column}
-    .bar{flex:0 0 auto;background:#155eef;color:#fff;padding:10px 14px;text-align:center;font-size:15px;font-weight:700}
-    .hint{flex:0 0 auto;padding:8px 12px;text-align:center;color:#334155;background:#eef4ff;font-size:12px;line-height:1.8}
-    iframe{display:block;flex:1 1 auto;width:100%;height:100%;border:0;background:#fff}
-    .fallback{padding:10px;text-align:center;font-size:12px;color:#475569}
-    .fallback a{color:#155eef}
-  </style>
-</head>
-<body>
-  <main class="shell">
-    <header class="bar">هوش پلتوب — آکادمی ۷</header>
-    <div class="hint">دستیار هوشمند با موبایل | آموزگار: میتا</div>
-    <iframe
-      src="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec"
-      title="هوش پلتوب آکادمی ۷"
-      allow="microphone; autoplay; clipboard-read; clipboard-write"
-      allowfullscreen
-      referrerpolicy="strict-origin-when-cross-origin"></iframe>
-    <div class="fallback">اگر برنامه در این صفحه باز نشد، <a href="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec" target="_blank" rel="noopener">نسخهٔ مستقیم هوش پلتوب را باز کن</a>.</div>
-  </main>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#155eef"><title>هوش پلتوب | آکادمی ۷</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#f5f7fb;font-family:Tahoma,Arial,sans-serif}.shell{height:100%;display:flex;flex-direction:column}.bar{flex:0 0 auto;background:#155eef;color:#fff;padding:10px 14px;text-align:center;font-size:15px;font-weight:700}.hint{flex:0 0 auto;padding:7px 10px;text-align:center;color:#334155;background:#eef4ff;font-size:12px;line-height:1.8}iframe{display:block;flex:1 1 auto;width:100%;height:100%;min-height:0;border:0;background:#fff}.fallback{flex:0 0 auto;padding:5px;text-align:center;font-size:11px;color:#475569}.fallback a{color:#155eef}.micveil{display:none;position:fixed;z-index:9999;inset:0;background:#0f172a99;align-items:center;justify-content:center;padding:18px}.micveil.show{display:flex}.micbox{width:min(100%,420px);background:white;border-radius:18px;padding:22px;box-shadow:0 18px 60px #0004;text-align:center;color:#172033}.micbox h2{font-size:19px;margin:0 0 12px}.micstatus{font-size:15px;line-height:1.9;min-height:55px;margin:8px 0 16px}.micbuttons{display:flex;gap:10px}.micbuttons button{flex:1;border:0;border-radius:12px;padding:13px 8px;font:700 15px Tahoma;cursor:pointer;background:#155eef;color:white}.micbuttons button.secondary{background:#e8eef8;color:#17345f}.micbuttons button:disabled{opacity:.45}.micnote{font-size:12px;color:#64748b;line-height:1.8;margin-top:12px}
+</style></head><body><main class="shell"><header class="bar">هوش پلتوب — آکادمی ۷</header><div class="hint">دستیار هوشمند با موبایل | آموزگار: میتا — برای گفتن سؤال، روی میکروفون داخل آکادمی بزن.</div>
+<iframe id="academyFrame" src="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec" title="هوش پلتوب آکادمی ۷" allow="microphone; autoplay; clipboard-read; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+<div class="fallback">اگر برنامه باز نشد، <a href="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec" target="_blank" rel="noopener">نسخه مستقیم</a> را باز کن.</div></main>
+<script>(function(){'use strict';var frame=document.getElementById('academyFrame'),stream=null,recorder=null,chunks=[],mime='audio/webm',appWindow=null,busy=false;function send(o){try{if(appWindow)appWindow.postMessage(o,'*')}catch(e){}}function say(t,isBusy,isRecording){send({type:'HP_MIC_STATUS',message:t,busy:!!isBusy,recording:!!isRecording})}function stopTracks(){if(stream){stream.getTracks().forEach(function(t){try{t.stop()}catch(e){}});stream=null}}function start(){if(busy||recorder&&recorder.state==='recording')return;busy=true;chunks=[];say('در حال درخواست اجازه میکروفون…',true,false);if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){busy=false;var m='این مرورگر ضبط صدا را پشتیبانی نمی‌کند؛ Chrome را به‌روز کن.';say(m,false,false);send({type:'HP_MIC_ERROR',message:m});return}navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}).then(function(s){stream=s;var types=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];mime='audio/webm';for(var i=0;i<types.length;i++){try{if(MediaRecorder.isTypeSupported(types[i])){mime=types[i].split(';')[0];break}}catch(e){}}try{recorder=new MediaRecorder(s,{mimeType:mime})}catch(e){recorder=new MediaRecorder(s);mime=recorder.mimeType||mime}recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};recorder.onerror=function(e){busy=false;stopTracks();var m='خطا در ضبط صدا: '+(e&&e.error&&e.error.message||'دوباره تلاش کن.');say(m,false,false);send({type:'HP_MIC_ERROR',message:m})};recorder.onstop=function(){stopTracks();busy=false;var blob=new Blob(chunks,{type:recorder&&recorder.mimeType||mime});chunks=[];if(!blob.size){say('صدایی ضبط نشد؛ دوباره تلاش کن.',false,false);return}say('در حال تبدیل گفتار فارسی به متن…',true,false);var fr=new FileReader();fr.onloadend=function(){var d=String(fr.result||''),i=d.indexOf(',');if(i<0){send({type:'HP_MIC_ERROR',message:'خواندن فایل صوتی ناموفق بود.'});return}send({type:'HP_MIC_AUDIO',base64:d.slice(i+1),mimeType:blob.type||mime});say('صدا ارسال شد؛ در حال })();</script></body></html>
