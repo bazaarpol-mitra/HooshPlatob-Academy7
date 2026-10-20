@@ -1,10 +1,327 @@
+
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#155eef"><title>هوش پلتوب | آکادمی ۷</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#155eef">
+<title>هوش پلتوب | آکادمی ۷</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#f5f7fb;font-family:Tahoma,Arial,sans-serif}.shell{height:100%;display:flex;flex-direction:column}.bar{flex:0 0 auto;background:#155eef;color:#fff;padding:10px 14px;text-align:center;font-size:15px;font-weight:700}.hint{flex:0 0 auto;padding:7px 10px;text-align:center;color:#334155;background:#eef4ff;font-size:12px;line-height:1.8}iframe{display:block;flex:1 1 auto;width:100%;height:100%;min-height:0;border:0;background:#fff}.fallback{flex:0 0 auto;padding:5px;text-align:center;font-size:11px;color:#475569}.fallback a{color:#155eef}.micveil{display:none;position:fixed;z-index:9999;inset:0;background:#0f172a99;align-items:center;justify-content:center;padding:18px}.micveil.show{display:flex}.micbox{width:min(100%,420px);background:white;border-radius:18px;padding:22px;box-shadow:0 18px 60px #0004;text-align:center;color:#172033}.micbox h2{font-size:19px;margin:0 0 12px}.micstatus{font-size:15px;line-height:1.9;min-height:55px;margin:8px 0 16px}.micbuttons{display:flex;gap:10px}.micbuttons button{flex:1;border:0;border-radius:12px;padding:13px 8px;font:700 15px Tahoma;cursor:pointer;background:#155eef;color:white}.micbuttons button.secondary{background:#e8eef8;color:#17345f}.micbuttons button:disabled{opacity:.45}.micnote{font-size:12px;color:#64748b;line-height:1.8;margin-top:12px}
-</style></head><body><main class="shell"><header class="bar">هوش پلتوب — آکادمی ۷</header><div class="hint">دستیار هوشمند با موبایل | آموزگار: میتا — برای گفتن سؤال، روی میکروفون داخل آکادمی بزن.</div>
-<iframe id="academyFrame" src="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec" title="هوش پلتوب آکادمی ۷" allow="microphone; autoplay; clipboard-read; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-<div class="fallback">اگر برنامه باز نشد، <a href="https://script.google.com/macros/s/AKfycbwldOvJ2jqqXmX6UFJdkZPw-kWa6qHu_Zpg4DNU42wYH0ppkz0tsUn9aF3GSuLxv_n6/exec" target="_blank" rel="noopener">نسخه مستقیم</a> را باز کن.</div></main>
-<script>(function(){'use strict';var frame=document.getElementById('academyFrame'),stream=null,recorder=null,chunks=[],mime='audio/webm',appWindow=null,busy=false;function send(o){try{if(appWindow)appWindow.postMessage(o,'*')}catch(e){}}function say(t,isBusy,isRecording){send({type:'HP_MIC_STATUS',message:t,busy:!!isBusy,recording:!!isRecording})}function stopTracks(){if(stream){stream.getTracks().forEach(function(t){try{t.stop()}catch(e){}});stream=null}}function start(){if(busy||recorder&&recorder.state==='recording')return;busy=true;chunks=[];say('در حال درخواست اجازه میکروفون…',true,false);if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||!window.MediaRecorder){busy=false;var m='این مرورگر ضبط صدا را پشتیبانی نمی‌کند؛ Chrome را به‌روز کن.';say(m,false,false);send({type:'HP_MIC_ERROR',message:m});return}navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}).then(function(s){stream=s;var types=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];mime='audio/webm';for(var i=0;i<types.length;i++){try{if(MediaRecorder.isTypeSupported(types[i])){mime=types[i].split(';')[0];break}}catch(e){}}try{recorder=new MediaRecorder(s,{mimeType:mime})}catch(e){recorder=new MediaRecorder(s);mime=recorder.mimeType||mime}recorder.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data)};recorder.onerror=function(e){busy=false;stopTracks();var m='خطا در ضبط صدا: '+(e&&e.error&&e.error.message||'دوباره تلاش کن.');say(m,false,false);send({type:'HP_MIC_ERROR',message:m})};recorder.onstop=function(){stopTracks();busy=false;var blob=new Blob(chunks,{type:recorder&&recorder.mimeType||mime});chunks=[];if(!blob.size){say('صدایی ضبط نشد؛ دوباره تلاش کن.',false,false);return}say('در حال تبدیل گفتار فارسی به متن…',true,false);var fr=new FileReader();fr.onloadend=function(){var d=String(fr.result||''),i=d.indexOf(',');if(i<0){send({type:'HP_MIC_ERROR',message:'خواندن فایل صوتی ناموفق بود.'});return}send({type:'HP_MIC_AUDIO',base64:d.slice(i+1),mimeType:blob.type||mime});say('صدا ارسال شد؛ در حال تبدیل به متن…',true,false)};fr.onerror=function(){send({type:'HP_MIC_ERROR',message:'خواندن فایل صوتی ناموفق بود.'})};fr.readAsDataURL(blob)};recorder.start(250);busy=false;say('🎙️ ضبط فعال است؛ دوباره روی همان میکروفون بزن تا تمام شود.',true,true)}).catch(function(e){busy=false;stopTracks();recorder=null;var n=e&&e.name||'Error',m=n==='NotAllowedError'||n==='PermissionDeniedError'?'اجازه میکروفون از سوی مرورگر رد شد.':('خطای میکروفون: '+n+(e&&e.message?' — '+e.message:''));say(m,false,false);send({type:'HP_MIC_ERROR',message:m})})}function stop(){if(recorder&&recorder.state==='recording'){say('در حال پایان ضبط…',true,false);try{recorder.stop()}catch(e){busy=false;stopTracks();send({type:'HP_MIC_ERROR',message:'توقف ضبط ناموفق بود.'})}return}say('ضبط فعالی وجود ندارد.',false,false)}function cancel(){try{if(recorder&&recorder.state==='recording'){recorder.onstop=null;recorder.stop()}}catch(e){}busy=false;stopTracks();recorder=null;chunks=[];say('ضبط لغو شد.',false,false)}window.addEventListener('message',function(e){var d=e.data;if(!d||typeof d!=='object'||!/^HP_MIC_/.test(String(d.type||'')))return;var trusted=e.origin==='https://script.google.com'||e.origin==='https://script.googleusercontent.com'||(/\.googleusercontent\.com$/.test(new URL(e.origin).hostname));if(!trusted)return;if(d.type==='HP_MIC_START'){appWindow=e.source;start()}else if(e.source===appWindow&&d.type==='HP_MIC_STOP')stop();else if(e.source===appWindow&&d.type==='HP_MIC_CANCEL')cancel()});})();</script></body></html>
+:root{--b:#155eef;--bg:#f5f7fb;--ink:#172033;--muted:#64748b;--line:#e2e8f0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px Tahoma,Arial,sans-serif;line-height:1.9}
+button,input,textarea{font:inherit}button{border:0;border-radius:12px;background:var(--b);color:white;padding:11px 14px;cursor:pointer;font-weight:bold}button:disabled{opacity:.5}
+input,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}textarea{min-height:95px;resize:vertical}
+header{background:var(--b);color:white;text-align:center;padding:16px}header h1{font-size:23px;margin:0}header p{margin:2px;font-size:14px}
+main{max-width:1100px;margin:auto;padding:13px}.panel,.welcome,.chapter,.lesson,.message{background:white;border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:12px}
+.welcome{background:#edf4ff;border-color:#d8e5ff}h2{font-size:19px;margin:0 0 10px}h3{font-size:16px;margin:0 0 8px}.muted{font-size:13px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.row>*{flex:1}.tabs{display:flex;gap:7px;overflow-x:auto;margin-bottom:12px}.tabs button{white-space:nowrap}.tabs .active{background:#0b3ea8}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}.chapter button{width:100%;margin:4px 0;text-align:right;background:#edf3ff;color:#1748a5}.chapter button.active{background:var(--b);color:white}
+.lesson{cursor:pointer}.lesson.active{border:2px solid var(--b)}.lesson.done{background:#f0fdf4}
+.message{white-space:pre-wrap;overflow-wrap:anywhere}.message.user{background:#edf3ff;margin-right:20px}.message.ai{margin-left:20px}
+.status{padding:9px;background:#f1f5f9;border-radius:10px;font-size:13px;margin:8px 0}.error{background:#fff1f2;color:#9f1239}.ok{background:#ecfdf5;color:#065f46}
+.hidden{display:none!important}.secondary{background:#e8eef8;color:#17345f}.danger{background:#9f1239}.mic{border-radius:50%;width:55px;height:55px;font-size:22px;padding:0}.recording{background:#b91c1c}
+progress{width:100%;height:12px;accent-color:var(--b)}footer{text-align:center;color:var(--muted);font-size:12px;padding:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>هوش پلتوب — آکادمی ۷</h1>
+<p>دستیار هوشمند با موبایل | آموزگار: میتا 💙</p>
+</header>
+<main>
+<section class="welcome">
+<h2>سلام عزیزم، خوش اومدی 💙</h2>
+<p>با هم هوش مصنوعی را به‌صورت کاربردی و با موبایل یاد می‌گیریم.</p>
+<div class="row">
+<div><b id="percent">۰٪</b><div class="muted">پیشرفت دوره</div></div>
+<div><b>۷ فصل</b><div class="muted">مسیر یادگیری</div></div>
+<div><b>۳۹ درس</b><div class="muted">برنامهٔ آموزشی</div></div>
+<div><b>۶ فایل</b><div class="muted">فایل جانبی</div></div>
+</div>
+<progress id="progress" max="39" value="0"></progress>
+</section>
+
+<nav class="tabs">
+<button class="active" data-tab="course">درس‌ها</button>
+<button data-tab="mita">گفت‌وگو با میتا</button>
+<button data-tab="prompt">کارگاه پرامپت</button>
+<button data-tab="files">فایل‌های جانبی</button>
+</nav>
+
+<section id="course" class="tab">
+<div class="grid">
+<div class="panel"><h2>فصل‌های آکادمی</h2><div id="chapters"></div></div>
+<div>
+<div class="panel"><h2 id="chapterTitle">درس‌ها</h2><div id="lessonList"></div></div>
+<div class="panel">
+<h2 id="lessonTitle">به آکادمی خوش آمدی</h2>
+<div id="lessonContent">برای شروع یک درس را انتخاب کن.</div>
+<div class="row" style="margin-top:10px">
+<button id="complete">تکمیل این درس</button>
+<button class="secondary" id="read">🔊 خواندن متن</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="mita" class="tab hidden">
+<div class="panel">
+<h2>میتا، دستیار هوشمند تو 💙</h2>
+<div id="chatStatus" class="status">آماده‌ام؛ سؤالت را بپرس.</div>
+<div id="chatMessages"></div>
+<textarea id="question" placeholder="سؤالت را بنویس..."></textarea>
+<div class="row" style="margin-top:8px">
+<button id="send">ارسال سؤال</button>
+<button id="mic" class="mic" aria-label="ضبط صدا">🎙️</button>
+<button id="stop" class="secondary">توقف صدا</button>
+</div>
+<p class="muted">برای شروع و پایان ضبط، روی میکروفون بزن. پس از تبدیل گفتار به متن، سؤال را ارسال کن.</p>
+</div>
+</section>
+
+<section id="prompt" class="tab hidden">
+<div class="panel">
+<h2>کارگاه ساخت پرامپت</h2>
+<input id="pTitle" placeholder="عنوان پرامپت">
+<textarea id="pInput" placeholder="چه کاری می‌خواهی هوش مصنوعی انجام دهد؟"></textarea>
+<div class="row">
+<button data-transform="بهبود">بهبود پرامپت</button>
+<button data-transform="حرفه‌ای‌سازی">حرفه‌ای‌سازی</button>
+<button data-transform="کوتاه‌سازی">کوتاه‌سازی</button>
+</div>
+<textarea id="pOutput" placeholder="پرامپت نهایی"></textarea>
+<div class="row">
+<button id="pSave">ذخیره</button>
+<button id="pCopy" class="secondary">کپی</button>
+<button id="pClear" class="secondary">پاک‌کردن فرم</button>
+</div>
+<div id="pStatus" class="status">ذخیره‌سازی روی همین دستگاه انجام می‌شود.</div>
+</div>
+<div class="panel"><h2>پرامپت‌های ذخیره‌شده</h2><div id="saved"></div></div>
+<div class="panel"><h2>سطل زباله</h2><div id="trash"></div></div>
+</section>
+
+<section id="files" class="tab hidden">
+<div class="panel">
+<h2>۶ فایل جانبی آکادمی</h2>
+<div id="extraList"></div>
+<p class="muted">این بخش فهرست فایل‌ها را نمایش می‌دهد. برای دانلود واقعی باید فایل‌های اصلی به مخزن اضافه و به این بخش متصل شوند.</p>
+</div>
+</section>
+</main>
+<footer>هوش پلتوب | آکادمی کاربردی هوش مصنوعی</footer>
+
+<script>
+'use strict';
+const API='https://hoosh-platob-api.soltanimaneshwomitra.workers.dev';
+const $=id=>document.getElementById(id);
+const get=(k,d)=>{try{let x=localStorage.getItem('hp7_'+k);return x===null?d:JSON.parse(x)}catch(e){return d}};
+const put=(k,v)=>{try{localStorage.setItem('hp7_'+k,JSON.stringify(v))}catch(e){}};
+
+/* ساختار آموزشی ۷ فصل و ۳۹ درس */
+const chapters=[
+{title:'فصل ۱ — شروع کار با هوش مصنوعی',lessons:[
+'آشنایی با هوش مصنوعی','شروع کار با ChatGPT در موبایل','نوشتن درخواست روشن و دقیق','تمرین عملی فصل اول']},
+{title:'فصل ۲ — مهارت‌های کاربردی ChatGPT',lessons:[
+'آشنایی با محیط ChatGPT','ساخت پرامپت کاربردی','تعیین نقش و هدف','گرفتن پاسخ دقیق‌تر','اصلاح و تکمیل پاسخ','تمرین عملی فصل دوم']},
+{title:'فصل ۳ — کار با Gemini',lessons:[
+'آشنایی با Gemini','شروع کار با موبایل','پرسش و پاسخ کاربردی','کار با متن و ایده‌ها','استفاده در کارهای روزانه','تمرین عملی فصل سوم']},
+{title:'فصل ۴ — تولید محتوا',lessons:[
+'ایده‌پردازی محتوا','نوشتن متن حرفه‌ای','محتوای شبکه‌های اجتماعی','بازنویسی و ویرایش','تنظیم لحن محتوا','تمرین عملی تولید محتوا']},
+{title:'فصل ۵ — هوش مصنوعی برای کسب‌وکار',lessons:[
+'شناخت مسئلهٔ مشتری','طراحی خدمت قابل‌فروش','شناخت مخاطب هدف','ساخت پیشنهاد فروش','نوشتن پیام مشتری','تمرین کسب‌وکاری']},
+{title:'فصل ۶ — ابزارها و گردش‌کارها',lessons:[
+'انتخاب ابزار مناسب','برنامه‌ریزی با موبایل','ساخت گردش‌کار ساده','کمک به یادگیری','بررسی کیفیت پاسخ','تمرین گردش‌کار']},
+{title:'فصل ۷ — پروژهٔ پایانی',lessons:[
+'انتخاب پروژه','طراحی راه‌حل','ساخت نسخهٔ اولیه','بررسی و بهبود نتیجه','برنامهٔ ادامهٔ مسیر']}
+];
+const extras=[
+'قالب ساخت خدمت قابل‌فروش با AI',
+'مجموعهٔ پرامپت‌های آماده',
+'چک‌لیست کار با ChatGPT',
+'چک‌لیست کار با Gemini',
+'راهنمای اجرای تمرین‌ها',
+'برگهٔ برنامه‌ریزی و پیگیری'
+];
+let lessons=[],number=0;
+chapters.forEach((c,ci)=>c.lessons.forEach((t)=>lessons.push({id:++number,chapter:ci,title:t})));
+let done=get('done',[]),chapterIndex=0,currentLesson=null;
+let saved=get('prompts',[]),deleted=get('trash',[]);
+let recorder=null,stream=null,chunks=[],recording=false;
+
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));
+ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('hidden',x.id!==b.dataset.tab));
+});
+function progress(){
+ $('progress').value=done.length;
+ $('percent').textContent=Math.round(done.length/39*100)+'٪';
+}
+function renderChapters(){
+ $('chapters').innerHTML='';
+ chapters.forEach((c,i)=>{
+  let b=document.createElement('button');
+  b.textContent=c.title+' ('+c.lessons.length+' درس)';
+  b.className=i===chapterIndex?'active':'';
+  b.onclick=()=>{chapterIndex=i;currentLesson=null;renderChapters();renderLessons()};
+  $('chapters').appendChild(b);
+ });
+}
+function renderLessons(){
+ $('chapterTitle').textContent=chapters[chapterIndex].title;
+ $('lessonList').innerHTML='';
+ lessons.filter(l=>l.chapter===chapterIndex).forEach(l=>{
+  let d=document.createElement('div');
+  d.className='lesson'+(l.id===currentLesson?' active':'')+(done.includes(l.id)?' done':'');
+  d.textContent=(done.includes(l.id)?'✓ ':'')+l.id+'. '+l.title;
+  d.onclick=()=>selectLesson(l);
+  $('lessonList').appendChild(d);
+ });
+}
+function selectLesson(l){
+ currentLesson=l.id;
+ $('lessonTitle').textContent=l.title;
+ $('lessonContent').textContent='این درس از مسیر آموزشی آکادمی هوش پلتوب است. برای حفظ امانت، متن کامل و اختصاصی درس اصلی باید از نسخهٔ مرجع آن بازیابی شود؛ این صفحه متن اصلی را جعل نمی‌کند.';
+ renderLessons();
+}
+$('complete').onclick=()=>{
+ if(!currentLesson){alert('ابتدا یک درس را انتخاب کن.');return}
+ if(!done.includes(currentLesson))done.push(currentLesson);
+ put('done',done);progress();renderLessons();
+};
+$('read').onclick=()=>{
+ if(!('speechSynthesis'in window)){alert('پخش گفتار در این مرورگر پشتیبانی نمی‌شود.');return}
+ speechSynthesis.cancel();
+ speechSynthesis.speak(new SpeechSynthesisUtterance($('lessonTitle').textContent+'. '+$('lessonContent').textContent));
+};
+extras.forEach((x,i)=>{
+ let d=document.createElement('div');d.className='lesson';d.textContent=(i+1)+'. '+x;$('extraList').appendChild(d);
+});
+
+/* API: کلید OpenAI فقط در Worker نگهداری می‌شود */
+async function callJSON(path,body){
+ const r=await fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ if(!r.ok)throw new Error('خطای سرویس: '+r.status);
+ return r.json();
+}
+function status(t,type=''){
+ $('chatStatus').className='status '+type;$('chatStatus').textContent=t;
+}
+function message(who,t){
+ let d=document.createElement('div');d.className='message '+who;
+ d.textContent=(who==='user'?'شما: ':'میتا: ')+t;
+ $('chatMessages').appendChild(d);$('chatMessages').scrollTop=$('chatMessages').scrollHeight;
+}
+async function sendQuestion(text){
+ text=(text||$('question').value).trim();if(!text)return;
+ $('question').value='';message('user',text);$('send').disabled=true;status('میتا در حال پاسخ‌دادن است…');
+ try{
+  const r=await callJSON('/api/chat',{
+   message:text,
+   systemPrompt:'تو میتا هستی، آموزگار فارسی‌زبان آکادمی هوش پلتوب. صمیمی، حرفه‌ای، دقیق و مناسب مبتدی‌ها پاسخ بده. مثال عملی موبایلی بزن. متن اختصاصی درس‌ها را اگر در ورودی نیست، ادعا نکن که می‌دانی.'
+  });
+  if(!r.answer)throw new Error(r.error||'پاسخی دریافت نشد.');
+  message('ai',r.answer);status('پاسخ میتا دریافت شد.','ok');
+ }catch(e){status('اتصال ناموفق: '+e.message+'؛ تنظیمات Worker و CORS را بررسی کن.','error')}
+ finally{$('send').disabled=false}
+}
+$('send').onclick=()=>sendQuestion();
+$('question').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendQuestion()}});
+$('stop').onclick=()=>{if('speechSynthesis'in window)speechSynthesis.cancel();if(window.currentAudio){window.currentAudio.pause();window.currentAudio=null}};
+async function speak(text){
+ try{
+  status('میتا در حال آماده‌سازی صداست…');
+  const r=await fetch(API+'/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  if(!r.ok)throw new Error('خطای تولید صدا: '+r.status);
+  const blob=await r.blob();
+  if(window.currentAudio){window.currentAudio.pause();URL.revokeObjectURL(window.currentAudio.src)}
+  const a=new Audio(URL.createObjectURL(blob));window.currentAudio=a;
+  a.play().catch(()=>status('برای پخش صدا دوباره روی دکمه بزن.'));
+  status('صدای میتا آماده است.','ok');
+ }catch(e){
+  status('تولید صدای میتا ناموفق بود: '+e.message,'error');
+ }
+}
+$('chatMessages').addEventListener('click',e=>{
+ const d=e.target.closest('.message.ai');if(d)speak(d.textContent.replace(/^میتا:\s*/,'')); 
+});
+
+/* میکروفون: ضبط در همین صفحه و ارسال به endpoint تبدیل گفتار */
+$('mic').onclick=async()=>{
+ if(recording){try{recorder.stop()}catch(e){}return}
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){status('مرورگر امکان ضبط صدا ندارد. Chrome را به‌روز کن.','error');return}
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({audio:true});
+  chunks=[];recorder=new MediaRecorder(stream);
+  recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  recorder.onstop=async()=>{
+   recording=false;$('mic').classList.remove('recording');$('mic').textContent='🎙️';
+   stream?.getTracks().forEach(t=>t.stop());stream=null;
+   const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});
+   status('در حال تبدیل گفتار به متن فارسی…');
+   try{
+    const fd=new FormData();fd.append('file',blob,'voice.webm');
+    const r=await fetch(API+'/api/transcribe',{method:'POST',body:fd});
+    if(!r.ok)throw new Error('خطای تبدیل صدا: '+r.status);
+    const data=await r.json();
+    if(!data.text)throw new Error(data.error||'گفتاری تشخیص داده نشد.');
+    $('question').value=data.text;status('متن آماده است؛ برای ارسال روی دکمهٔ ارسال سؤال بزن.','ok');
+   }catch(e){status('تبدیل صدا ناموفق بود: '+e.message,'error')}
+  };
+  recorder.start();recording=true;$('mic').classList.add('recording');$('mic').textContent='⏹';
+  status('در حال ضبط؛ دوباره روی میکروفون بزن تا تمام شود.');
+ }catch(e){status('اجازهٔ میکروفون دریافت نشد: '+(e.message||e.name),'error')}
+};
+
+/* کارگاه پرامپت */
+async function transform(kind){
+ const p=$('pInput').value.trim();if(!p){$('pStatus').textContent='ابتدا خواسته‌ات را بنویس.';return}
+ $('pStatus').textContent='در حال آماده‌سازی پرامپت…';
+ const instructions={
+ 'بهبود':'این درخواست را به پرامپتی روشن و کاربردی تبدیل کن:',
+ 'حرفه‌ای‌سازی':'پرامپت را حرفه‌ای کن و در صورت نیاز نقش، هدف، مخاطب و قالب خروجی را تعیین کن:',
+ 'کوتاه‌سازی':'پرامپت را بدون از دست‌دادن هدف اصلی کوتاه کن:'
+ };
+ try{
+  const r=await callJSON('/api/chat',{message:instructions[kind]+'\n\n'+p,systemPrompt:'متخصص طراحی پرامپت فارسی هستی. خروجی آمادهٔ کپی بده و توضیح اضافه نده.'});
+  $('pOutput').value=r.answer||'';$('pStatus').textContent='پرامپت آماده شد.';
+ }catch(e){$('pStatus').textContent='خطا: '+e.message}
+}
+document.querySelectorAll('[data-transform]').forEach(b=>b.onclick=()=>transform(b.dataset.transform));
+$('pSave').onclick=()=>{
+ const output=$('pOutput').value.trim();if(!output){$('pStatus').textContent='ابتدا پرامپت نهایی را بساز.';return}
+ saved.unshift({id:Date.now(),title:$('pTitle').value.trim()||'پرامپت بدون عنوان',input:$('pInput').value,output});
+ put('prompts',saved);renderPrompts();$('pStatus').textContent='ذخیره شد.';
+};
+$('pCopy').onclick=async()=>{
+ try{await navigator.clipboard.writeText($('pOutput').value);$('pStatus').textContent='کپی شد.'}
+ catch(e){$('pOutput').select();$('pStatus').textContent='متن انتخاب شد؛ گزینهٔ کپی را بزن.'}
+};
+$('pClear').onclick=()=>{$('pTitle').value='';$('pInput').value='';$('pOutput').value=''};
+function renderPrompts(){
+ $('saved').innerHTML='';$('trash').innerHTML='';
+ if(!saved.length)$('saved').textContent='هنوز پرامپتی ذخیره نشده است.';
+ saved.forEach(p=>{
+  let d=document.createElement('div');d.className='lesson';
+  let h=document.createElement('h3');h.textContent=p.title;d.appendChild(h);
+  let t=document.createElement('p');t.textContent=p.output;d.appendChild(t);
+  let row=document.createElement('div');row.className='row';
+  let edit=document.createElement('button');edit.textContent='ویرایش';edit.onclick=()=>{$('pTitle').value=p.title;$('pInput').value=p.input;$('pOutput').value=p.output};
+  let copy=document.createElement('button');copy.textContent='کپی';copy.className='secondary';copy.onclick=()=>navigator.clipboard?.writeText(p.output);
+  let del=document.createElement('button');del.textContent='حذف';del.className='danger';del.onclick=()=>{saved=saved.filter(x=>x.id!==p.id);deleted.unshift(p);put('prompts',saved);put('trash',deleted);renderPrompts()};
+  row.append(edit,copy,del);d.appendChild(row);$('saved').appendChild(d);
+ });
+ if(!deleted.length)$('trash').textContent='سطل زباله خالی است.';
+ deleted.forEach(p=>{
+  let d=document.createElement('div');d.className='lesson';d.textContent=p.title;
+  let row=document.createElement('div');row.className='row';
+  let restore=document.createElement('button');restore.textContent='بازیابی';restore.onclick=()=>{deleted=deleted.filter(x=>x.id!==p.id);saved.unshift(p);put('trash',deleted);put('prompts',saved);renderPrompts()};
+  let remove=document.createElement('button');remove.textContent='حذف دائمی';remove.className='danger';remove.onclick=()=>{if(confirm('برای همیشه حذف شود؟')){deleted=deleted.filter(x=>x.id!==p.id);put('trash',deleted);renderPrompts()}};
+  row.append(restore,remove);d.appendChild(row);$('trash').appendChild(d);
+ });
+}
+renderChapters();renderLessons();renderPrompts();progress();
+</script>
+</body>
+</html>
